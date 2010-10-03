@@ -14,7 +14,7 @@ KEYWORDS="x86"
 IUSE=""
 
 DEPEND="dev-db/credis"
-RDEPEND="${DEPEND} virtual/httpd-cgi dev-db/redis"
+RDEPEND="${DEPEND} virtual/httpd-cgi dev-db/redis dev-libs/libxslt"
 
 src_install() {
 	emake DESTDIR="${D}" install || die
