@@ -13,8 +13,10 @@ SLOT="0"
 KEYWORDS="x86"
 IUSE=""
 
+# TODO, maybe: curl & libxslt are only used by client, so add a "client" use
+# flag
 DEPEND="dev-db/credis"
-RDEPEND="${DEPEND} virtual/httpd-cgi dev-db/redis dev-libs/libxslt"
+RDEPEND="${DEPEND} virtual/httpd-cgi dev-db/redis dev-libs/libxslt net-misc/curl"
 
 src_install() {
 	emake DESTDIR="${D}" install || die
