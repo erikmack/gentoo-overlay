@@ -10,7 +10,7 @@ SRC_URI="http://github.com/downloads/erikmack/todoservice/todoservice-0.1.tar.gz
 
 LICENSE="AGPL-3"
 SLOT="0"
-KEYWORDS="x86"
+KEYWORDS="~x86"
 IUSE=""
 
 # TODO, maybe: curl & libxslt are only used by client, so add a "client" use

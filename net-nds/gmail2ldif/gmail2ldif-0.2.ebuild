@@ -10,7 +10,7 @@ SRC_URI="http://github.com/downloads/erikmack/gmail2ldif/gmail2ldif-0.2.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="x86 amd64"
+KEYWORDS="~x86 ~amd64"
 IUSE=""
 
 DEPEND="virtual/libiconv"

@@ -10,7 +10,7 @@ SRC_URI="http://credis.googlecode.com/files/credis-0.2.3.tar.gz"
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="x86"
+KEYWORDS="~x86"
 IUSE=""
 
 DEPEND=""
