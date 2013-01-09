@@ -4,8 +4,8 @@ inherit git-2
 
 SLOT="0"
 LICENSE="ISC"
-DESCRIPTION="Socket acceptor pool for TCP protocols"
-HOMEPAGE="https://github.com/extend/ranch"
+DESCRIPTION="Small, fast, modular HTTP server written in Erlang"
+HOMEPAGE="https://github.com/extend/cowboy"
 KEYWORDS="~amd64"
 IUSE="doc"
 
@@ -13,8 +13,8 @@ RDEPEND="dev-lang/erlang"
 DEPEND="${RDEPEND}
         dev-util/rebar"
 
-EGIT_REPO_URI="https://github.com/extend/ranch.git"
-EGIT_COMMIT="0.4.0"
+EGIT_REPO_URI="https://github.com/extend/cowboy.git"
+EGIT_COMMIT="0.6.1"
 
 src_compile() {
     rebar compile
@@ -32,10 +32,8 @@ src_install() {
     dodir /usr/lib/erlang/lib/${PF}/src
     insinto /usr/lib/erlang/lib/${PF}/src
     doins src/*
-
+    
     if use doc; then
 	dohtml doc/*
     fi
 }
-
-
