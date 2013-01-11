@@ -9,7 +9,8 @@ HOMEPAGE="https://github.com/extend/cowboy"
 KEYWORDS="~amd64"
 IUSE="doc"
 
-RDEPEND="dev-lang/erlang"
+RDEPEND="dev-lang/erlang
+         net-libs/ranch"
 DEPEND="${RDEPEND}
         dev-util/rebar"
 
