@@ -1,8 +1,9 @@
 EAPI="2"
 
+# TODO: needed?
 inherit eutils
 
-IUSE=""
+IUSE="doc"
 DESCRIPTION="Extincter is an arcade game for HTML5 canvas, Websockets, and Erlang"
 SRC_URI="http://cca5776e216269181119-b6f23c0a32ff8f4a34aaf282fcfbc8f5.r53.cf2.rackcdn.com/${P}.tar.gz"
 
@@ -11,12 +12,20 @@ SLOT="0"
 LICENSE="AGPL-3"
 KEYWORDS="~amd64"
 
-DEPEND="dev-lang/erlang"
+DEPEND="dev-lang/erlang
+        doc? ( media-gfx/graphviz[svg] )"
 RDEPEND="${DEPEND} =net-libs/ranch-0.4.0
 	>=www-servers/cowboy-0.6.1"
 
 src_compile() {
     rebar compile
+
+    if use doc; then
+	pushd doc
+	./builddot.sh
+	popd
+    fi
+
 }
 
 src_install() {
@@ -43,6 +52,12 @@ src_install() {
     dodir /usr/lib/erlang/lib/${PF}/priv/www
     insinto /usr/lib/erlang/lib/${PF}/priv/www
     doins priv/www/*
+
+    if use doc; then
+	dodir /usr/lib/erlang/lib/${PF}/doc
+	insinto /usr/lib/erlang/lib/${PF}/doc
+	doins doc/*
+    fi
 
     insinto /usr/lib/erlang/lib/${PF}
     doins *
