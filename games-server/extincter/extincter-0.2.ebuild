@@ -18,6 +18,7 @@ RDEPEND="${DEPEND} =net-libs/ranch-0.4.0
 	>=www-servers/cowboy-0.6.1"
 
 src_compile() {
+    pushd extincter-*
     rebar compile
 
     if use doc; then
@@ -25,10 +26,11 @@ src_compile() {
 	./builddot.sh
 	popd
     fi
-
+    popd
 }
 
 src_install() {
+    pushd extincter-*
     dodir /usr/lib/erlang/lib/${PF}/ebin
     insinto /usr/lib/erlang/lib/${PF}/ebin
     doins ebin/*
@@ -61,4 +63,5 @@ src_install() {
 
     insinto /usr/lib/erlang/lib/${PF}
     doins *
+    popd
 }
