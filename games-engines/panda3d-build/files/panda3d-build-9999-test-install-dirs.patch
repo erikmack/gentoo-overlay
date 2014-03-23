@@ -1,0 +1,11 @@
+--- pptempl/Template.unix.pp	2014-03-09 09:03:20.903427660 -0500
++++ pptempl/Template.unix.pp	2014-03-09 09:04:07.814424453 -0500
+@@ -290,7 +290,7 @@
+ install : all install-dirs $[install_targets]
+ 
+ install-dirs:
+-$[TAB] mkdir -p $[install_dirs]
++$[TAB] [ -z "$[install_dirs]" ] || mkdir -p $[install_dirs]
+ 
+ install-igate : $[sort $[installed_igate_files]]
+ 

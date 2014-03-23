@@ -1,0 +1,87 @@
+--- ppDirectory.cxx	2014-03-05 20:39:45.376956399 -0600
++++ ppDirectory.cxx	2014-03-05 20:42:12.923946310 -0600
+@@ -823,68 +823,7 @@
+ ////////////////////////////////////////////////////////////////////
+ void PPDirectory::
+ update_file_dependencies(const string &cache_filename) {
+-  if (dry_run) {
+-    // If this is just a dry run, just report circularities.
+-    Dependables::const_iterator di;
+-    for (di = _dependables.begin(); di != _dependables.end(); ++di) {
+-      PPDependableFile *file = (*di).second;
+-      if (file->was_examined()) {
+-        if (file->is_circularity()) {
+-          cerr << "Warning: circular #include directives:\n"
+-               << "  " << file->get_circularity() << "\n";
+-        }
+-      }
+-    }
+-
+-  } else {
+-    // Open up the dependency cache file in the directory.
+-    Filename cache_pathname(get_fullpath(), cache_filename);
+-    cache_pathname.set_text();
+-    cache_pathname.unlink();
+-
+-    // If we have no files, don't bother writing the cache.
+-    bool wrote_anything = false;
+-    if (!_dependables.empty()) {
+-      ofstream out;
+-      if (!cache_pathname.open_write(out)) {
+-        cerr << "Cannot update cache dependency file " << cache_pathname << "\n";
+-        return;
+-      }
+-
+-      if (verbose) {
+-        cerr << "Rewriting cache " << cache_pathname << "\n";
+-      }
+-      
+-      // Walk through our list of dependable files, writing them out the
+-      // the cache file.
+-      bool external_tree = (_tree->get_main_tree() != _tree);
+-      Dependables::const_iterator di;
+-      for (di = _dependables.begin(); di != _dependables.end(); ++di) {
+-        PPDependableFile *file = (*di).second;
+-        if (file->was_examined() || (external_tree && file->was_cached())) {
+-          if (file->is_circularity()) {
+-            cerr << "Warning: circular #include directives:\n"
+-                 << "  " << file->get_circularity() << "\n";
+-          }
+-          file->write_cache(out);
+-          wrote_anything = true;
+-        }
+-      }
+-      
+-      out.close();
+-    }
+-      
+-    if (!wrote_anything) {
+-      // Well, if we didn't write anything, remove the cache file
+-      // after all.
+-      cache_pathname.unlink();
+-    }
+-  }
+-    
+-  Children::iterator ci;
+-  for (ci = _children.begin(); ci != _children.end(); ++ci) {
+-    (*ci)->update_file_dependencies(cache_filename);
+-  }
++  return;
+ }
+ 
+ ////////////////////////////////////////////////////////////////////
+--- ppDirectoryTree.cxx	2014-03-05 20:39:45.376956399 -0600
++++ ppDirectoryTree.cxx	2014-03-05 20:42:28.307945258 -0600
+@@ -306,11 +306,6 @@
+ ////////////////////////////////////////////////////////////////////
+ void PPDirectoryTree::
+ update_file_dependencies(const string &cache_filename) {
+-  _root->update_file_dependencies(cache_filename);
+-
+-  RelatedTrees::iterator ri;
+-  for (ri = _related_trees.begin(); ri != _related_trees.end(); ++ri) {
+-    (*ri)->update_file_dependencies(cache_filename);
+-  }
++  return;
+ }
+ 

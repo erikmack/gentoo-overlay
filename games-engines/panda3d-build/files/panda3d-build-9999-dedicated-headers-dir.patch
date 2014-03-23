@@ -1,0 +1,28 @@
+--- pptempl/Global.pp	2014-03-03 23:51:09.139987204 -0600
++++ pptempl/Global.pp	2014-03-03 23:42:01.434024656 -0600
+@@ -918,14 +918,14 @@
+   #else
+     #set other_trees $[other_trees] $[tree_install]
+     #set other_trees_lib $[other_trees_lib] $[tree_install]/lib
+-    #set other_trees_include $[other_trees_include] $[tree_install]/include
++    #set other_trees_include $[other_trees_include] $[tree_install]/include/panda3d
+   #endif
+ #end tree
+ 
+ #define install_lib_dir $[or $[INSTALL_LIB_DIR],$[install_dir]/lib]
+ #define other_trees_lib $[or $[INSTALL_LIB_DIR],$[other_trees_lib]]
+ 
+-#define install_headers_dir $[or $[INSTALL_HEADERS_DIR],$[install_dir]/include]
++#define install_headers_dir $[or $[INSTALL_HEADERS_DIR],$[install_dir]/include/panda3d]
+ #define other_trees_include $[or $[INSTALL_HEADERS_DIR],$[other_trees_include]]
+ 
+ #define install_bin_dir $[or $[INSTALL_BIN_DIR],$[install_dir]/bin]
+@@ -936,7 +936,7 @@
+ #defer install_py_package_dir $[install_lib_dir]/$[PACKAGE]
+ 
+ #if $[ne $[DTOOL_INSTALL],]
+-  #define install_parser_inc_dir $[DTOOL_INSTALL]/include/parser-inc
++  #define install_parser_inc_dir $[DTOOL_INSTALL]/include/panda3d/parser-inc
+ #else
+   #define install_parser_inc_dir $[install_headers_dir]/parser-inc
+ #endif

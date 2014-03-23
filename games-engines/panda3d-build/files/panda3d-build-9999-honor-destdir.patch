@@ -1,0 +1,317 @@
+--- pptempl/Template.unix.pp	2014-03-06 19:47:46.977261603 -0600
++++ pptempl/Template.unix.pp	2014-03-06 19:54:17.817234877 -0600
+@@ -129,15 +129,15 @@
+ // we create the directories now.  This reduces problems from
+ // multiprocess builds.
+ #mkdir $[sort \
+-    $[if $[install_lib],$[install_lib_dir]] \
+-    $[if $[install_bin] $[install_scripts],$[install_bin_dir]] \
+-    $[if $[install_lib] $[install_modules],$[install_lib_dir]] \
+-    $[if $[install_headers],$[install_headers_dir]] \
+-    $[if $[install_parser_inc],$[install_parser_inc_dir]] \
+-    $[if $[install_data],$[install_data_dir]] \
+-    $[if $[install_config],$[install_config_dir]] \
+-    $[if $[install_igatedb],$[install_igatedb_dir]] \
+-    $[if $[install_py],$[install_py_dir] $[install_py_package_dir]] \
++    $[if $[install_lib],$(DESTDIR)$[install_lib_dir]] \
++    $[if $[install_bin] $[install_scripts],$(DESTDIR)$[install_bin_dir]] \
++    $[if $[install_lib] $[install_modules],$(DESTDIR)$[install_lib_dir]] \
++    $[if $[install_headers],$(DESTDIR)$[install_headers_dir]] \
++    $[if $[install_parser_inc],$(DESTDIR)$[install_parser_inc_dir]] \
++    $[if $[install_data],$(DESTDIR)$[install_data_dir]] \
++    $[if $[install_config],$(DESTDIR)$[install_config_dir]] \
++    $[if $[install_igatedb],$(DESTDIR)$[install_igatedb_dir]] \
++    $[if $[install_py],$[install_py_dir] $(DESTDIR)$[install_py_package_dir]] \
+     ]
+ 
+ // Similarly, we need to ensure that $[ODIR] exists.  Trying to make
+@@ -192,6 +192,21 @@
+ //MAKEFLAGS := -j$[NUMBER_OF_PROCESSORS]
+ //#endif
+ 
++DESTDIR=
++
++#define install_dirs \
++    $[sort \
++    $[if $[install_lib],$(DESTDIR)$[install_lib_dir]] \
++    $[if $[install_bin] $[install_scripts],$(DESTDIR)$[install_bin_dir]] \
++    $[if $[install_lib] $[install_modules],$(DESTDIR)$[install_lib_dir]] \
++    $[if $[install_headers],$(DESTDIR)$[install_headers_dir]] \
++    $[if $[install_parser_inc],$(DESTDIR)$[install_parser_inc_dir]] \
++    $[if $[install_data],$(DESTDIR)$[install_data_dir]] \
++    $[if $[install_config],$(DESTDIR)$[install_config_dir]] \
++    $[if $[install_igatedb],$(DESTDIR)$[install_igatedb_dir]] \
++    $[if $[install_py],$(DESTDIR)$[install_py_dir] $(DESTDIR)$[install_py_package_dir]] \
++    ]    
++
+ // The 'all' rule makes all the stuff in the directory except for the
+ // test_bin_targets.  It doesn't do any installation, however.
+ #define all_targets \
+@@ -256,23 +271,26 @@
+ // install directory (or remove them).  The 'install' rule also makes
+ // the directories if necessary.
+ #define installed_files \
+-     $[INSTALL_SCRIPTS:%=$[install_bin_dir]/%] \
+-     $[INSTALL_MODULES:%=$[install_lib_dir]/%] \
+-     $[INSTALL_HEADERS:%=$[install_headers_dir]/%] \
+-     $[INSTALL_PARSER_INC:%=$[install_parser_inc_dir]/%] \
+-     $[INSTALL_DATA:%=$[install_data_dir]/%] \
+-     $[INSTALL_CONFIG:%=$[install_config_dir]/%] \
+-     $[if $[install_py],$[install_py:%=$[install_py_dir]/%] $[install_py_package_dir]/__init__.py]
++     $[INSTALL_SCRIPTS:%=$(DESTDIR)$[install_bin_dir]/%] \
++     $[INSTALL_MODULES:%=$(DESTDIR)$[install_lib_dir]/%] \
++     $[INSTALL_HEADERS:%=$(DESTDIR)$[install_headers_dir]/%] \
++     $[INSTALL_PARSER_INC:%=$(DESTDIR)$[install_parser_inc_dir]/%] \
++     $[INSTALL_DATA:%=$(DESTDIR)$[install_data_dir]/%] \
++     $[INSTALL_CONFIG:%=$(DESTDIR)$[install_config_dir]/%] \
++     $[if $[install_py],$[install_py:%=$(DESTDIR)$[install_py_dir]/%] $(DESTDIR)$[install_py_package_dir]/__init__.py]
+ 
+ #define installed_igate_files \
+-     $[get_igatedb(metalib_target lib_target ss_lib_target):$[ODIR]/%=$[install_igatedb_dir]/%]
++     $[get_igatedb(metalib_target lib_target ss_lib_target):$[ODIR]/%=$(DESTDIR)$[install_igatedb_dir]/%]
+ 
+ #define install_targets \
+      $[active_target(metalib_target lib_target static_lib_target dynamic_lib_target ss_lib_target):%=install-lib%] \
+      $[active_target(bin_target sed_bin_target):%=install-%] \
+      $[installed_files]
+ 
+-install : all $[install_targets]
++install : all install-dirs $[install_targets]
++
++install-dirs:
++$[TAB] mkdir -p $[install_dirs]
+ 
+ install-igate : $[sort $[installed_igate_files]]
+ 
+@@ -371,14 +389,14 @@
+ // Here are the rules to install and uninstall the library and
+ // everything that goes along with it.
+ #define installed_files \
+-    $[install_lib_dir]/$[lib_prefix]$[TARGET]$[lib_ext] \
+-    $[if $[link_extra_bundle],$[install_lib_dir]/$[lib_prefix]$[TARGET]$[bundle_ext]] \
+-    $[INSTALL_SCRIPTS:%=$[install_bin_dir]/%] \
+-    $[INSTALL_MODULES:%=$[install_lib_dir]/%] \
+-    $[INSTALL_HEADERS:%=$[install_headers_dir]/%] \
+-    $[INSTALL_DATA:%=$[install_data_dir]/%] \
+-    $[INSTALL_CONFIG:%=$[install_config_dir]/%] \
+-    $[igatedb:$[ODIR]/%=$[install_igatedb_dir]/%]
++    $(DESTDIR)$[install_lib_dir]/$[lib_prefix]$[TARGET]$[lib_ext] \
++    $[if $[link_extra_bundle],$(DESTDIR)$[install_lib_dir]/$[lib_prefix]$[TARGET]$[bundle_ext]] \
++    $[INSTALL_SCRIPTS:%=$(DESTDIR)$[install_bin_dir]/%] \
++    $[INSTALL_MODULES:%=$(DESTDIR)$[install_lib_dir]/%] \
++    $[INSTALL_HEADERS:%=$(DESTDIR)$[install_headers_dir]/%] \
++    $[INSTALL_DATA:%=$(DESTDIR)$[install_data_dir]/%] \
++    $[INSTALL_CONFIG:%=$(DESTDIR)$[install_config_dir]/%] \
++    $[igatedb:$[ODIR]/%=$(DESTDIR)$[install_igatedb_dir]/%]
+ 
+ install-lib$[TARGET] : $[installed_files]
+ 
+@@ -387,15 +405,15 @@
+ $[TAB] rm -f $[sort $[installed_files]]
+ #endif
+ 
+-$[install_lib_dir]/$[lib_prefix]$[TARGET]$[lib_ext] : $[ODIR]/$[lib_prefix]$[TARGET]$[lib_ext]
++$(DESTDIR)$[install_lib_dir]/$[lib_prefix]$[TARGET]$[lib_ext] : $[ODIR]/$[lib_prefix]$[TARGET]$[lib_ext]
+ #define local $[ODIR]/$[lib_prefix]$[TARGET]$[lib_ext]
+-#define dest $[install_lib_dir]
++#define dest $(DESTDIR)$[install_lib_dir]
+ $[TAB] $[INSTALL_PROG]
+ 
+ #if $[link_extra_bundle]
+-$[install_lib_dir]/$[lib_prefix]$[TARGET]$[bundle_ext] : $[ODIR]/$[lib_prefix]$[TARGET]$[bundle_ext]
++$(DESTDIR)$[install_lib_dir]/$[lib_prefix]$[TARGET]$[bundle_ext] : $[ODIR]/$[lib_prefix]$[TARGET]$[bundle_ext]
+ #define local $[ODIR]/$[lib_prefix]$[TARGET]$[bundle_ext]
+-#define dest $[install_lib_dir]
++#define dest $(DESTDIR)$[install_lib_dir]
+ $[TAB] $[INSTALL_PROG]
+ #endif  // link_extra_bundle
+ 
+@@ -412,9 +430,9 @@
+   #define igatemod $[TARGET]
+ #endif
+ 
+-$[igatedb:$[ODIR]/%=$[install_igatedb_dir]/%] : $[igatedb]
++$(DESTDIR)$[igatedb:$[ODIR]/%=$[install_igatedb_dir]/%] : $[igatedb]
+ #define local $[igatedb]
+-#define dest $[install_igatedb_dir]
++#define dest $(DESTDIR)$[install_igatedb_dir]
+ $[TAB] $[INSTALL]
+ 
+ // We have to split this out as a separate rule to properly support
+@@ -490,7 +508,7 @@
+ $[TAB] chmod +x $[target]
+ 
+ #define installed_files \
+-    $[install_bin_dir]/$[TARGET]
++    $(DESTDIR)$[install_bin_dir]/$[TARGET]
+ 
+ install-$[TARGET] : $[installed_files]
+ 
+@@ -500,8 +518,8 @@
+ #endif
+ 
+ #define local $[ODIR]/$[TARGET]
+-#define dest $[install_bin_dir]
+-$[install_bin_dir]/$[TARGET] : $[ODIR]/$[TARGET]
++#define dest $(DESTDIR)$[install_bin_dir]
++$(DESTDIR)$[install_bin_dir]/$[TARGET] : $[ODIR]/$[TARGET]
+ $[TAB] $[INSTALL_PROG]
+ 
+ #end sed_bin_target
+@@ -530,12 +548,12 @@
+ #endif
+ 
+ #define installed_files \
+-    $[install_bin_dir]/$[TARGET] \
+-    $[INSTALL_SCRIPTS:%=$[install_bin_dir]/%] \
+-    $[INSTALL_MODULES:%=$[install_lib_dir]/%] \
+-    $[INSTALL_HEADERS:%=$[install_headers_dir]/%] \
+-    $[INSTALL_DATA:%=$[install_data_dir]/%] \
+-    $[INSTALL_CONFIG:%=$[install_config_dir]/%]
++    $(DESTDIR)$[install_bin_dir]/$[TARGET] \
++    $[INSTALL_SCRIPTS:%=$(DESTDIR)$[install_bin_dir]/%] \
++    $[INSTALL_MODULES:%=$(DESTDIR)$[install_lib_dir]/%] \
++    $[INSTALL_HEADERS:%=$(DESTDIR)$[install_headers_dir]/%] \
++    $[INSTALL_DATA:%=$(DESTDIR)$[install_data_dir]/%] \
++    $[INSTALL_CONFIG:%=$(DESTDIR)$[install_config_dir]/%]
+ 
+ install-$[TARGET] : $[installed_files]
+ 
+@@ -544,9 +562,9 @@
+ $[TAB] rm -f $[sort $[installed_files]]
+ #endif
+ 
+-$[install_bin_dir]/$[TARGET] : $[ODIR]/$[TARGET]
++$(DESTDIR)$[install_bin_dir]/$[TARGET] : $[ODIR]/$[TARGET]
+ #define local $[ODIR]/$[TARGET]
+-#define dest $[install_bin_dir]
++#define dest $(DESTDIR)$[install_bin_dir]
+ $[TAB] $[INSTALL_PROG]
+ 
+ #end bin_target
+@@ -720,65 +738,65 @@
+ // And now the rules to install the auxiliary files, like headers and
+ // data files.
+ #foreach file $[install_scripts]
+-$[install_bin_dir]/$[file] : $[file]
++$(DESTDIR)$[install_bin_dir]/$[file] : $[file]
+ #define local $[file]
+-#define dest $[install_bin_dir]
++#define dest $(DESTDIR)$[install_bin_dir]
+ $[TAB] $[INSTALL_PROG]
+ #end file
+ 
+ #foreach file $[install_modules]
+-$[install_lib_dir]/$[file] : $[file]
++$(DESTDIR)$[install_lib_dir]/$[file] : $[file]
+ #define local $[file]
+-#define dest $[install_lib_dir]
++#define dest $(DESTDIR)$[install_lib_dir]
+ $[TAB] $[INSTALL_PROG]
+ #end file
+ 
+ #foreach file $[install_headers]
+-$[install_headers_dir]/$[file] : $[file]
++$(DESTDIR)$[install_headers_dir]/$[file] : $[file]
+ #define local $[file]
+-#define dest $[install_headers_dir]
++#define dest $(DESTDIR)$[install_headers_dir]
+ $[TAB] $[INSTALL]
+ #end file
+ 
+ #foreach file $[install_parser_inc]
+ #if $[ne $[dir $[file]], ./]
+-$[install_parser_inc_dir]/$[file] : $[notdir $[file]]
++$(DESTDIR)$[install_parser_inc_dir]/$[file] : $[notdir $[file]]
+   #define local $[notdir $[file]]
+-  #define dest $[install_parser_inc_dir]/$[dir $[file]]
+-$[TAB] mkdir -p $[install_parser_inc_dir]/$[dir $[file]] || echo
++  #define dest $(DESTDIR)$[install_parser_inc_dir]/$[dir $[file]]
++$[TAB] mkdir -p $(DESTDIR)$[install_parser_inc_dir]/$[dir $[file]] || echo
+ $[TAB] $[INSTALL]
+ #else
+-$[install_parser_inc_dir]/$[file] : $[file]
++$(DESTDIR)$[install_parser_inc_dir]/$[file] : $[file]
+   #define local $[file]
+-  #define dest $[install_parser_inc_dir]
++  #define dest $(DESTDIR)$[install_parser_inc_dir]
+ $[TAB] $[INSTALL]
+ #endif
+ #end file
+ 
+ #foreach file $[install_data]
+-$[install_data_dir]/$[file] : $[file]
++$(DESTDIR)$[install_data_dir]/$[file] : $[file]
+ #define local $[file]
+-#define dest $[install_data_dir]
++#define dest $(DESTDIR)$[install_data_dir]
+ $[TAB] $[INSTALL]
+ #end file
+ 
+ #foreach file $[install_config]
+-$[install_config_dir]/$[file] : $[file]
++$(DESTDIR)$[install_config_dir]/$[file] : $[file]
+ #define local $[file]
+-#define dest $[install_config_dir]
++#define dest $(DESTDIR)$[install_config_dir]
+ $[TAB] $[INSTALL]
+ #end file
+ 
+ #foreach file $[install_py]
+-$[install_py_dir]/$[file] : $[file]
++$(DESTDIR)$[install_py_dir]/$[file] : $[file]
+ #define local $[file]
+-#define dest $[install_py_dir]
++#define dest $(DESTDIR)$[install_py_dir]
+ $[TAB] $[INSTALL]
+ #end file
+ 
+ #if $[install_py]
+-$[install_py_package_dir]/__init__.py :
+-$[TAB] touch $[install_py_package_dir]/__init__.py
++$(DESTDIR)$[install_py_package_dir]/__init__.py :
++$[TAB] touch $(DESTDIR)$[install_py_package_dir]/__init__.py
+ #endif
+ 
+ // Finally, all the special targets.  These are commands that just need
+@@ -849,17 +867,19 @@
+ #### Generated automatically by $[PPREMAKE] $[PPREMAKE_VERSION] from $[SOURCEFILE].
+ ################################# DO NOT EDIT ###########################
+ 
++DESTDIR=
++
+ all : $[subdirs]
+ test : $[subdirs:%=test-%]
+ igate : $[subdirs:%=igate-%]
+ clean : $[subdirs:%=clean-%]
+ clean-igate : $[subdirs:%=clean-igate-%]
+ cleanall : $[subdirs:%=cleanall-%]
+-install : $[if $[CONFIG_HEADER],$[install_headers_dir] $[install_headers_dir]/$[CONFIG_HEADER]] $[subdirs:%=install-%]
++install : $[if $[CONFIG_HEADER],$(DESTDIR)$[install_headers_dir] $(DESTDIR)$[install_headers_dir]/$[CONFIG_HEADER]] $[subdirs:%=install-%]
+ install-igate : $[subdirs:%=install-igate-%]
+ uninstall : $[subdirs:%=uninstall-%]
+ #if $[CONFIG_HEADER]
+-$[TAB] rm -f $[install_headers_dir]/$[CONFIG_HEADER]
++$[TAB] rm -f $(DESTDIR)$[install_headers_dir]/$[CONFIG_HEADER]
+ #endif
+ uninstall-igate : $[subdirs:%=uninstall-igate-%]
+ 
+@@ -929,13 +949,13 @@
+ #endif
+ 
+ #if $[ne $[CONFIG_HEADER],]
+-$[install_headers_dir] :
+-$[TAB] @test -d $[install_headers_dir] || echo mkdir -p $[install_headers_dir]
+-$[TAB] @test -d $[install_headers_dir] || mkdir -p $[install_headers_dir]
++$(DESTDIR)$[install_headers_dir] :
++$[TAB] @test -d $(DESTDIR)$[install_headers_dir] || echo mkdir -p $(DESTDIR)$[install_headers_dir]
++$[TAB] @test -d $(DESTDIR)$[install_headers_dir] || mkdir -p $(DESTDIR)$[install_headers_dir]
+ 
+-$[install_headers_dir]/$[CONFIG_HEADER] : $[CONFIG_HEADER]
++$(DESTDIR)$[install_headers_dir]/$[CONFIG_HEADER] : $[CONFIG_HEADER]
+ #define local $[CONFIG_HEADER]
+-#define dest $[install_headers_dir]
++#define dest $(DESTDIR)$[install_headers_dir]
+ $[TAB] $[INSTALL]
+ #endif
+ 

@@ -1,0 +1,38 @@
+--- src/http/baseincomingset.i	2014-03-23 10:03:10.497083646 -0500
++++ src/http/baseincomingset.i	2014-03-23 09:54:56.125117451 -0500
+@@ -46,7 +46,7 @@
+         if(ans < 0)
+         {
+             delete *lp;
+-            erase(lp);
++            /* erase(lp); */
+         }               
+         if(ans > 0)
+         {
+@@ -54,7 +54,7 @@
+             if( cs == ConnectionDoClose)
+             {
+                 delete *lp;
+-                erase(lp);
++                /* erase(lp); */
+             }
+         }
+     }   
+@@ -70,7 +70,7 @@
+ template <class _INCLASS1,class _IN_LISTEN,typename  MESSAGE_READER_BUF, typename  MESSAGE_READER_UPPASS> 
+ inline void BaseIncomingSet<_INCLASS1,_IN_LISTEN,MESSAGE_READER_BUF,MESSAGE_READER_UPPASS>::AddAConection(_INCLASS1 * newt)
+ {
+-    push_back(newt);
++    /* push_back(newt); */
+ }
+ ////////////////////////////////////////////////////////////////////
+ // Function name    : BaseIncomingSet<_INCLASS1,_IN_LISTEN,MESSAGE_READER_BUF,MESSAGE_READER_UPPASS>::BaseIncomingSet
+@@ -194,7 +194,7 @@
+         lpNext++;   
+         (*lp)->Reset();
+         delete *lp;
+-        erase(lp);
++        /* erase(lp); */
+     }               
+ }
+ 
