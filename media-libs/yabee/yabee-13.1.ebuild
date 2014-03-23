@@ -22,12 +22,12 @@ RDEPEND="${DEPEND}"
 S=${WORKDIR}
 
 src_install() {
-    local target=${D}/usr/share/blender/${BLENDER_VERSION}/scripts/addons
-    install -d $target
-    cd $target || die
-    cp --recursive ${S}/* . || die
+	local target=${D}/usr/share/blender/${BLENDER_VERSION}/scripts/addons
+	install -d $target || die
+	cd $target || die
+	cp --recursive "${S}/io_scene_egg" . || die
 
-    einfo "Remember that the plugin must be enabled in the"
-    einfo "Blender interface.  This is a user-level action,"
-    einfo "so portage can't automate it"
+	einfo "Remember that the plugin must be enabled in the"
+	einfo "Blender interface.  This is a user-level action,"
+	einfo "so portage can't automate it"
 }
